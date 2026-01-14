@@ -1,0 +1,60 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build results
+**/bin/
+**/obj/
+**/out/
+
+# Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Test results
+**/TestResults/
+**/*.trx
+
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Docker
+**/.dockerignore
+**/Dockerfile*
+**/docker-compose*
+
+# Logs
+**/logs/
+**/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+*.md
+!README.md
+
+# Verification reports
+*_BUILD_VERIFICATION.md
+
+# Temporary files
+**/tmp/
+**/temp/
+**/*.tmp
+
+# Coverage
+**/coverage/
+**/*.coverage

@@ -1,0 +1,71 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: vendorrisk-postgres
+    environment:
+      POSTGRES_DB: VendorRiskDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - vendorrisk-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: vendorrisk-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - vendorrisk-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Vendor Risk API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vendorrisk-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=VendorRiskDB;Username=postgres;Password=postgres
+      - Redis__ConnectionString=redis:6379
+      - Redis__InstanceName=VendorRisk_
+    ports:
+      - "5001:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - vendorrisk-network
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+networks:
+  vendorrisk-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local

@@ -1,0 +1,28 @@
+# Development overrides
+services:
+  api:
+    # 'target: build' satırı KALDIRILDI. Artık uygulama Runtime olarak çalışacak.
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - Serilog__MinimumLevel__Default=Debug
+    volumes:
+      # Source code mapping
+      - ./src/VendorRiskAPI.API:/src/src/VendorRiskAPI.API
+      - ./logs:/app/logs
+    ports:
+      - "5001:8080"
+      - "5002:5002"  # Debugger port
+    
+  postgres:
+    # Development ortamında dışarıdan erişim (örn: pgAdmin için)
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+
+  redis:
+    # Development ortamında dışarıdan erişim
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --appendfsync everysec
